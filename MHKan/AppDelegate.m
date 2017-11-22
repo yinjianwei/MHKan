@@ -10,6 +10,7 @@
 #import "ViewController.h"
 #import "NetworkManager.h"
 #import "ServiceListViewController.h"
+#import "DrawViewController.h"
 
 @interface AppDelegate ()
 
@@ -24,7 +25,7 @@
     CGRect frame = [[UIScreen mainScreen] bounds];
     self.window = [[UIWindow alloc] initWithFrame:frame];
     self.window.backgroundColor = [UIColor whiteColor];
-    ServiceListViewController* vc = [[ServiceListViewController alloc] init];
+    DrawViewController* vc = [[DrawViewController alloc] init];
     UINavigationController* navi = [[UINavigationController alloc] initWithRootViewController:vc];
     self.window.rootViewController = navi;
     [self.window makeKeyAndVisible];

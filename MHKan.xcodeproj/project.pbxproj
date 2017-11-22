@@ -28,6 +28,8 @@
 		7C7272411FAAA89B000038B8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C72723F1FAAA89B000038B8 /* LaunchScreen.storyboard */; };
 		7C7272441FAAA89B000038B8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7272431FAAA89B000038B8 /* main.m */; };
 		7C7273F41FAAAA5E000038B8 /* ViewMHViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7273F31FAAAA5E000038B8 /* ViewMHViewController.m */; };
+		7CD0BFEF1FC2758B00B6E08F /* DrawViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */; };
+		7CD0BFF21FC2793500B6E08F /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CD0BFF11FC2793500B6E08F /* DrawView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +78,10 @@
 		7C7272431FAAA89B000038B8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7C7273F21FAAAA5E000038B8 /* ViewMHViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewMHViewController.h; sourceTree = "<group>"; };
 		7C7273F31FAAAA5E000038B8 /* ViewMHViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewMHViewController.m; sourceTree = "<group>"; };
+		7CD0BFED1FC2758B00B6E08F /* DrawViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrawViewController.h; sourceTree = "<group>"; };
+		7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DrawViewController.m; sourceTree = "<group>"; };
+		7CD0BFF01FC2793500B6E08F /* DrawView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
+		7CD0BFF11FC2793500B6E08F /* DrawView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -161,6 +167,10 @@
 				7C1CE4571FBE760400BA9CE2 /* ServiceListViewController.m */,
 				7C1CE4591FBE828300BA9CE2 /* TalkViewController.h */,
 				7C1CE45A1FBE828300BA9CE2 /* TalkViewController.m */,
+				7CD0BFED1FC2758B00B6E08F /* DrawViewController.h */,
+				7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */,
+				7CD0BFF01FC2793500B6E08F /* DrawView.h */,
+				7CD0BFF11FC2793500B6E08F /* DrawView.m */,
 			);
 			path = MHKan;
 			sourceTree = "<group>";
@@ -256,6 +266,8 @@
 				7C1CE45B1FBE828300BA9CE2 /* TalkViewController.m in Sources */,
 				7C3521BD1FAAEB66009EE03E /* MASViewConstraint.m in Sources */,
 				7C3521BC1FAAEB66009EE03E /* MASViewAttribute.m in Sources */,
+				7CD0BFEF1FC2758B00B6E08F /* DrawViewController.m in Sources */,
+				7CD0BFF21FC2793500B6E08F /* DrawView.m in Sources */,
 				7C3521C01FAAEB66009EE03E /* View+MASAdditions.m in Sources */,
 				7C7272441FAAA89B000038B8 /* main.m in Sources */,
 				7C7272361FAAA89B000038B8 /* AppDelegate.m in Sources */,
