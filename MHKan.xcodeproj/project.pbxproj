@@ -28,6 +28,8 @@
 		7C7272411FAAA89B000038B8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C72723F1FAAA89B000038B8 /* LaunchScreen.storyboard */; };
 		7C7272441FAAA89B000038B8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7272431FAAA89B000038B8 /* main.m */; };
 		7C7273F41FAAAA5E000038B8 /* ViewMHViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7273F31FAAAA5E000038B8 /* ViewMHViewController.m */; };
+		7C7CF5461FCD0B9F0075A289 /* SizeMenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7CF5451FCD0B9F0075A289 /* SizeMenuView.m */; };
+		7C9157871FCBBD98009D867F /* city.js in Resources */ = {isa = PBXBuildFile; fileRef = 7C9157861FCBBD98009D867F /* city.js */; };
 		7CD0BFEF1FC2758B00B6E08F /* DrawViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */; };
 		7CD0BFF21FC2793500B6E08F /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CD0BFF11FC2793500B6E08F /* DrawView.m */; };
 /* End PBXBuildFile section */
@@ -78,6 +80,9 @@
 		7C7272431FAAA89B000038B8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7C7273F21FAAAA5E000038B8 /* ViewMHViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewMHViewController.h; sourceTree = "<group>"; };
 		7C7273F31FAAAA5E000038B8 /* ViewMHViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewMHViewController.m; sourceTree = "<group>"; };
+		7C7CF5441FCD0B9F0075A289 /* SizeMenuView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SizeMenuView.h; sourceTree = "<group>"; };
+		7C7CF5451FCD0B9F0075A289 /* SizeMenuView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SizeMenuView.m; sourceTree = "<group>"; };
+		7C9157861FCBBD98009D867F /* city.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = city.js; sourceTree = "<group>"; };
 		7CD0BFED1FC2758B00B6E08F /* DrawViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrawViewController.h; sourceTree = "<group>"; };
 		7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DrawViewController.m; sourceTree = "<group>"; };
 		7CD0BFF01FC2793500B6E08F /* DrawView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
@@ -147,6 +152,7 @@
 		7C7272331FAAA89B000038B8 /* MHKan */ = {
 			isa = PBXGroup;
 			children = (
+				7C7CF5431FCD0B500075A289 /* Paint */,
 				7C35219C1FAAEB66009EE03E /* Masonry */,
 				7C72724A1FAAA946000038B8 /* Resources */,
 				7C7272341FAAA89B000038B8 /* AppDelegate.h */,
@@ -167,10 +173,6 @@
 				7C1CE4571FBE760400BA9CE2 /* ServiceListViewController.m */,
 				7C1CE4591FBE828300BA9CE2 /* TalkViewController.h */,
 				7C1CE45A1FBE828300BA9CE2 /* TalkViewController.m */,
-				7CD0BFED1FC2758B00B6E08F /* DrawViewController.h */,
-				7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */,
-				7CD0BFF01FC2793500B6E08F /* DrawView.h */,
-				7CD0BFF11FC2793500B6E08F /* DrawView.m */,
 			);
 			path = MHKan;
 			sourceTree = "<group>";
@@ -178,8 +180,22 @@
 		7C72724A1FAAA946000038B8 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				7C9157861FCBBD98009D867F /* city.js */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		7C7CF5431FCD0B500075A289 /* Paint */ = {
+			isa = PBXGroup;
+			children = (
+				7CD0BFED1FC2758B00B6E08F /* DrawViewController.h */,
+				7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */,
+				7CD0BFF01FC2793500B6E08F /* DrawView.h */,
+				7CD0BFF11FC2793500B6E08F /* DrawView.m */,
+				7C7CF5441FCD0B9F0075A289 /* SizeMenuView.h */,
+				7C7CF5451FCD0B9F0075A289 /* SizeMenuView.m */,
+			);
+			path = Paint;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -243,6 +259,7 @@
 				7C7272411FAAA89B000038B8 /* LaunchScreen.storyboard in Resources */,
 				7C72723E1FAAA89B000038B8 /* Assets.xcassets in Resources */,
 				7C3521B71FAAEB66009EE03E /* Info.plist in Resources */,
+				7C9157871FCBBD98009D867F /* city.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -273,6 +290,7 @@
 				7C7272361FAAA89B000038B8 /* AppDelegate.m in Sources */,
 				7C3521B81FAAEB66009EE03E /* MASCompositeConstraint.m in Sources */,
 				7C3521BF1FAAEB66009EE03E /* NSLayoutConstraint+MASDebugAdditions.m in Sources */,
+				7C7CF5461FCD0B9F0075A289 /* SizeMenuView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

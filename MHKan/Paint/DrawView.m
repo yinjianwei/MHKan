@@ -18,7 +18,6 @@
 @property(nonatomic, strong)UIImageView*        drawImage;
 @property(nonatomic, strong)UIImageView*        backImage;
 
-@property(nonatomic, strong)CAShapeLayer*       curDrawLayer;
 @property(nonatomic)BOOL                        isUseEraser;
 
 @end
@@ -34,6 +33,7 @@
         self.isUseEraser = NO;
         
         self.drawPath = [[UIBezierPath alloc] init];
+        self.drawLayer.lineWidth = 5;
         self.eraserPath = [[UIBezierPath alloc] init];
         self.eraserPath.lineWidth = 10;
         
@@ -59,11 +59,11 @@
         self.drawLayer.lineCap = kCALineCapRound;
         self.drawLayer.lineWidth = 5;
         [self.drawImage.layer addSublayer:self.drawLayer];
-        
-        self.curDrawLayer = self.drawLayer;
     }
     return self;
 }
+
+#pragma mark - touch event
 
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
@@ -86,11 +86,9 @@
         [self.eraserPath addLineToPoint:pos];
         UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, 0);
         [self.drawImage.image drawInRect:self.bounds];
-        [[UIColor redColor] set];
-        self.drawPath.lineWidth = 5;
+        [[UIColor colorWithCGColor:self.drawLayer.strokeColor] set];
         [self.drawPath stroke];
         [[UIColor clearColor] set];
-        self.eraserPath.lineWidth = 10;
         [self.eraserPath strokeWithBlendMode:kCGBlendModeClear alpha:1.0];
         [self.eraserPath stroke];
         self.drawImage.image = UIGraphicsGetImageFromCurrentImageContext();
@@ -99,7 +97,7 @@
     else
     {
         [self.drawPath addLineToPoint:pos];
-        self.curDrawLayer.path = self.drawPath.CGPath;
+        self.drawLayer.path = self.drawPath.CGPath;
     }
 }
 
@@ -113,22 +111,52 @@
     [self clearPath];
 }
 
+#pragma mark - public method
+
 -(void)clear
 {
     [self clearPath];
     self.drawImage.image = nil;
 }
 
+-(void)useEraser:(BOOL)isUse
+{
+    self.isUseEraser = isUse;
+}
+
+-(void)setLineWidth:(CGFloat)width
+{
+    self.drawLayer.lineWidth = width;
+    self.drawPath.lineWidth = width;
+}
+
+-(CGFloat)getLineWidth
+{
+    return self.drawLayer.lineWidth;
+}
+
+-(void)setLineColor:(UIColor *)color
+{
+    self.drawLayer.strokeColor = color.CGColor;
+}
+
+-(void)setEraserWidth:(CGFloat)width
+{
+    self.eraserPath.lineWidth = width;
+}
+
+-(CGFloat)getEraserWidth
+{
+    return self.eraserPath.lineWidth;
+}
+
+#pragma mark - self method
+
 -(void)clearPath
 {
     [self.drawPath removeAllPoints];
     [self.eraserPath removeAllPoints];
     self.drawLayer.path = self.drawPath.CGPath;
-}
-
--(void)useEraser:(BOOL)isUse
-{
-    self.isUseEraser = isUse;
 }
 
 -(UIImage*)screenShotWithView:(UIView*)view

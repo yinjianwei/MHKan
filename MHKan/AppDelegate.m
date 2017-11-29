@@ -30,7 +30,82 @@
     self.window.rootViewController = navi;
     [self.window makeKeyAndVisible];
     
+//    [self transferJson];
+    
     return YES;
+}
+
+-(void)transferJson
+{
+    NSString* file = [[NSBundle mainBundle] pathForResource:@"city" ofType:@"js"];
+    NSData* data = [NSData dataWithContentsOfFile:file];
+    NSError* error;
+    NSArray* jsonData = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
+    if(jsonData)
+    {
+        NSInteger count = jsonData.count;
+        NSMutableDictionary* provData = [[NSMutableDictionary alloc] init];
+        for(int i = 0;i < count;i++)
+        {
+            NSDictionary* info = [jsonData objectAtIndex:i];
+            NSString* prov = [info objectForKey:@"prov"];
+            NSString* city = [info objectForKey:@"city"];
+            city = city ? city : prov;
+            NSString* area = [info objectForKey:@"area"];
+            if(area && ![area isEqualToString:@""])
+            {
+                NSMutableDictionary* cityData = [provData objectForKey:prov];
+                if(!cityData)
+                {
+                    cityData = [[NSMutableDictionary alloc] init];
+                }
+                NSMutableArray* areaData = [cityData objectForKey:city];
+                if(!areaData)
+                {
+                    areaData = [[NSMutableArray alloc] init];
+                }
+                [areaData addObject:area];
+                [cityData setObject:areaData forKey:city];
+                [provData setObject:cityData forKey:prov];
+            }
+        }
+        
+        NSMutableArray* finalData = [[NSMutableArray alloc] init];
+        for(NSString* prov in provData)
+        {
+            NSMutableDictionary* writeProvData = [[NSMutableDictionary alloc] init];
+            NSMutableArray* writeCityData = [[NSMutableArray alloc] init];
+            
+            NSMutableDictionary* cityData = [provData objectForKey:prov];
+            for(NSString* city in cityData)
+            {
+                NSMutableDictionary* cityDict = [[NSMutableDictionary alloc] init];
+                [cityDict setObject:city forKey:@"name"];
+                [cityDict setObject:[cityData objectForKey:city] forKey:@"area"];
+                [writeCityData addObject:cityDict];
+            }
+            
+            [writeProvData setObject:prov forKey:@"name"];
+            [writeProvData setObject:writeCityData forKey:@"city"];
+            [finalData addObject:writeProvData];
+        }
+        [finalData sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            NSString* prov1 = [obj1 objectForKey:@"name"];
+            NSString* prov2 = [obj2 objectForKey:@"name"];
+            return prov1 > prov2;
+        }];
+        NSData* writeData = [NSJSONSerialization dataWithJSONObject:finalData options:NSJSONWritingPrettyPrinted error:nil];
+        NSString* str = [[NSString alloc] initWithData:writeData encoding:NSUTF8StringEncoding];
+        NSArray* paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
+        NSString* cachesPath = [[paths objectAtIndex:0] stringByAppendingPathComponent:@"Caches"];
+        NSString* filePath = [cachesPath stringByAppendingPathComponent:@"city.js"];
+        NSURL *url = [NSURL fileURLWithPath:filePath];
+        BOOL result = [str writeToURL:url atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        if(!result)
+        {
+            NSLog(@"write error！");
+        }
+    }
 }
 
 

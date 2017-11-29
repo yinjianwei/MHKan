@@ -13,4 +13,11 @@
 -(void)clear;
 -(void)useEraser:(BOOL)isUse;
 
+-(void)setLineWidth:(CGFloat)width;
+-(CGFloat)getLineWidth;
+-(void)setLineColor:(UIColor*)color;
+
+-(void)setEraserWidth:(CGFloat)width;
+-(CGFloat)getEraserWidth;
+
 @end
