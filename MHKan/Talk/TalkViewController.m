@@ -107,9 +107,9 @@
 
 -(void)onBtnSender:(id)sender
 {
-    NSString* chatText = self.textInput.text;
-    NSDictionary* data = @{@"chat":chatText};
-    [[NetworkManager sharedManager] sendData:data];
+//    NSString* chatText = self.textInput.text;
+//    NSDictionary* data = @{@"chat":chatText};
+//    [[NetworkManager sharedManager] sendData:data];
 }
 
 -(void)showTextFromServer:(NSDictionary*)data

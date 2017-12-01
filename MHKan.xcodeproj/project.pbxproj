@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		7C1CE4581FBE760400BA9CE2 /* ServiceListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1CE4571FBE760400BA9CE2 /* ServiceListViewController.m */; };
 		7C1CE45B1FBE828300BA9CE2 /* TalkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C1CE45A1FBE828300BA9CE2 /* TalkViewController.m */; };
+		7C2B45A21FD14F9800D7AA6E /* TestViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2B45A11FD14F9800D7AA6E /* TestViewController.m */; };
 		7C2E82B61FBD1EA60068A7B4 /* NetworkManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C2E82B51FBD1EA60068A7B4 /* NetworkManager.m */; };
 		7C3521B71FAAEB66009EE03E /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7C35219D1FAAEB66009EE03E /* Info.plist */; };
 		7C3521B81FAAEB66009EE03E /* MASCompositeConstraint.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C35219F1FAAEB66009EE03E /* MASCompositeConstraint.m */; };
@@ -21,7 +22,10 @@
 		7C3521BF1FAAEB66009EE03E /* NSLayoutConstraint+MASDebugAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C3521B11FAAEB66009EE03E /* NSLayoutConstraint+MASDebugAdditions.m */; };
 		7C3521C01FAAEB66009EE03E /* View+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C3521B31FAAEB66009EE03E /* View+MASAdditions.m */; };
 		7C3521C11FAAEB66009EE03E /* ViewController+MASAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C3521B61FAAEB66009EE03E /* ViewController+MASAdditions.m */; };
-		7C4C7FA31FBC11D800B46FEC /* FileUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C4C7FA21FBC11D800B46FEC /* FileUtils.m */; };
+		7C711B121FCFA166001074F5 /* PaintProtocols.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C711B111FCFA166001074F5 /* PaintProtocols.m */; };
+		7C711B191FCFA5EF001074F5 /* NetData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C711B181FCFA5EF001074F5 /* NetData.m */; };
+		7C711B1C1FCFAEB8001074F5 /* NetDataQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C711B1B1FCFAEB8001074F5 /* NetDataQueue.m */; };
+		7C711B201FD005B4001074F5 /* BaseProtocols.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C711B1F1FD005B4001074F5 /* BaseProtocols.m */; };
 		7C7272361FAAA89B000038B8 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7272351FAAA89B000038B8 /* AppDelegate.m */; };
 		7C7272391FAAA89B000038B8 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7272381FAAA89B000038B8 /* ViewController.m */; };
 		7C72723E1FAAA89B000038B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7C72723D1FAAA89B000038B8 /* Assets.xcassets */; };
@@ -39,6 +43,8 @@
 		7C1CE4571FBE760400BA9CE2 /* ServiceListViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ServiceListViewController.m; sourceTree = "<group>"; };
 		7C1CE4591FBE828300BA9CE2 /* TalkViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TalkViewController.h; sourceTree = "<group>"; };
 		7C1CE45A1FBE828300BA9CE2 /* TalkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TalkViewController.m; sourceTree = "<group>"; };
+		7C2B45A01FD14F9800D7AA6E /* TestViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TestViewController.h; sourceTree = "<group>"; };
+		7C2B45A11FD14F9800D7AA6E /* TestViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TestViewController.m; sourceTree = "<group>"; };
 		7C2E82B41FBD1EA60068A7B4 /* NetworkManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetworkManager.h; sourceTree = "<group>"; };
 		7C2E82B51FBD1EA60068A7B4 /* NetworkManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetworkManager.m; sourceTree = "<group>"; };
 		7C35219D1FAAEB66009EE03E /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -67,8 +73,15 @@
 		7C3521B41FAAEB66009EE03E /* View+MASShorthandAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "View+MASShorthandAdditions.h"; sourceTree = "<group>"; };
 		7C3521B51FAAEB66009EE03E /* ViewController+MASAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ViewController+MASAdditions.h"; sourceTree = "<group>"; };
 		7C3521B61FAAEB66009EE03E /* ViewController+MASAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ViewController+MASAdditions.m"; sourceTree = "<group>"; };
-		7C4C7FA11FBC11D800B46FEC /* FileUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileUtils.h; sourceTree = "<group>"; };
-		7C4C7FA21FBC11D800B46FEC /* FileUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileUtils.m; sourceTree = "<group>"; };
+		7C711B101FCFA166001074F5 /* PaintProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PaintProtocols.h; sourceTree = "<group>"; };
+		7C711B111FCFA166001074F5 /* PaintProtocols.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PaintProtocols.m; sourceTree = "<group>"; };
+		7C711B171FCFA5EF001074F5 /* NetData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetData.h; sourceTree = "<group>"; };
+		7C711B181FCFA5EF001074F5 /* NetData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetData.m; sourceTree = "<group>"; };
+		7C711B1A1FCFAEB8001074F5 /* NetDataQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NetDataQueue.h; sourceTree = "<group>"; };
+		7C711B1B1FCFAEB8001074F5 /* NetDataQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NetDataQueue.m; sourceTree = "<group>"; };
+		7C711B1D1FCFFE72001074F5 /* ProtocolType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProtocolType.h; sourceTree = "<group>"; };
+		7C711B1E1FD005B4001074F5 /* BaseProtocols.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BaseProtocols.h; sourceTree = "<group>"; };
+		7C711B1F1FD005B4001074F5 /* BaseProtocols.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BaseProtocols.m; sourceTree = "<group>"; };
 		7C7272311FAAA89A000038B8 /* MHKan.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MHKan.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7C7272341FAAA89B000038B8 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		7C7272351FAAA89B000038B8 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -133,6 +146,54 @@
 			path = Masonry;
 			sourceTree = "<group>";
 		};
+		7C711B131FCFA4A7001074F5 /* MH */ = {
+			isa = PBXGroup;
+			children = (
+				7C7272371FAAA89B000038B8 /* ViewController.h */,
+				7C7272381FAAA89B000038B8 /* ViewController.m */,
+				7C7273F21FAAAA5E000038B8 /* ViewMHViewController.h */,
+				7C7273F31FAAAA5E000038B8 /* ViewMHViewController.m */,
+			);
+			path = MH;
+			sourceTree = "<group>";
+		};
+		7C711B141FCFA4C6001074F5 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				7C72723D1FAAA89B000038B8 /* Assets.xcassets */,
+				7C72723F1FAAA89B000038B8 /* LaunchScreen.storyboard */,
+				7C7272421FAAA89B000038B8 /* Info.plist */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		7C711B151FCFA4F3001074F5 /* Talk */ = {
+			isa = PBXGroup;
+			children = (
+				7C1CE4591FBE828300BA9CE2 /* TalkViewController.h */,
+				7C1CE45A1FBE828300BA9CE2 /* TalkViewController.m */,
+			);
+			path = Talk;
+			sourceTree = "<group>";
+		};
+		7C711B161FCFA523001074F5 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				7C711B101FCFA166001074F5 /* PaintProtocols.h */,
+				7C711B111FCFA166001074F5 /* PaintProtocols.m */,
+				7C2E82B41FBD1EA60068A7B4 /* NetworkManager.h */,
+				7C2E82B51FBD1EA60068A7B4 /* NetworkManager.m */,
+				7C711B171FCFA5EF001074F5 /* NetData.h */,
+				7C711B181FCFA5EF001074F5 /* NetData.m */,
+				7C711B1A1FCFAEB8001074F5 /* NetDataQueue.h */,
+				7C711B1B1FCFAEB8001074F5 /* NetDataQueue.m */,
+				7C711B1D1FCFFE72001074F5 /* ProtocolType.h */,
+				7C711B1E1FD005B4001074F5 /* BaseProtocols.h */,
+				7C711B1F1FD005B4001074F5 /* BaseProtocols.m */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
 		7C7272281FAAA89A000038B8 = {
 			isa = PBXGroup;
 			children = (
@@ -152,27 +213,20 @@
 		7C7272331FAAA89B000038B8 /* MHKan */ = {
 			isa = PBXGroup;
 			children = (
+				7C711B161FCFA523001074F5 /* Networking */,
+				7C711B151FCFA4F3001074F5 /* Talk */,
+				7C711B141FCFA4C6001074F5 /* Supporting Files */,
+				7C711B131FCFA4A7001074F5 /* MH */,
 				7C7CF5431FCD0B500075A289 /* Paint */,
 				7C35219C1FAAEB66009EE03E /* Masonry */,
 				7C72724A1FAAA946000038B8 /* Resources */,
 				7C7272341FAAA89B000038B8 /* AppDelegate.h */,
 				7C7272351FAAA89B000038B8 /* AppDelegate.m */,
-				7C7272371FAAA89B000038B8 /* ViewController.h */,
-				7C7272381FAAA89B000038B8 /* ViewController.m */,
-				7C72723D1FAAA89B000038B8 /* Assets.xcassets */,
-				7C72723F1FAAA89B000038B8 /* LaunchScreen.storyboard */,
-				7C7272421FAAA89B000038B8 /* Info.plist */,
 				7C7272431FAAA89B000038B8 /* main.m */,
-				7C7273F21FAAAA5E000038B8 /* ViewMHViewController.h */,
-				7C7273F31FAAAA5E000038B8 /* ViewMHViewController.m */,
-				7C4C7FA11FBC11D800B46FEC /* FileUtils.h */,
-				7C4C7FA21FBC11D800B46FEC /* FileUtils.m */,
-				7C2E82B41FBD1EA60068A7B4 /* NetworkManager.h */,
-				7C2E82B51FBD1EA60068A7B4 /* NetworkManager.m */,
 				7C1CE4561FBE760400BA9CE2 /* ServiceListViewController.h */,
 				7C1CE4571FBE760400BA9CE2 /* ServiceListViewController.m */,
-				7C1CE4591FBE828300BA9CE2 /* TalkViewController.h */,
-				7C1CE45A1FBE828300BA9CE2 /* TalkViewController.m */,
+				7C2B45A01FD14F9800D7AA6E /* TestViewController.h */,
+				7C2B45A11FD14F9800D7AA6E /* TestViewController.m */,
 			);
 			path = MHKan;
 			sourceTree = "<group>";
@@ -271,8 +325,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				7C2E82B61FBD1EA60068A7B4 /* NetworkManager.m in Sources */,
-				7C4C7FA31FBC11D800B46FEC /* FileUtils.m in Sources */,
 				7C3521BA1FAAEB66009EE03E /* MASConstraintMaker.m in Sources */,
+				7C711B201FD005B4001074F5 /* BaseProtocols.m in Sources */,
 				7C7273F41FAAAA5E000038B8 /* ViewMHViewController.m in Sources */,
 				7C7272391FAAA89B000038B8 /* ViewController.m in Sources */,
 				7C3521B91FAAEB66009EE03E /* MASConstraint.m in Sources */,
@@ -282,14 +336,18 @@
 				7C3521BE1FAAEB66009EE03E /* NSArray+MASAdditions.m in Sources */,
 				7C1CE45B1FBE828300BA9CE2 /* TalkViewController.m in Sources */,
 				7C3521BD1FAAEB66009EE03E /* MASViewConstraint.m in Sources */,
+				7C711B191FCFA5EF001074F5 /* NetData.m in Sources */,
 				7C3521BC1FAAEB66009EE03E /* MASViewAttribute.m in Sources */,
+				7C2B45A21FD14F9800D7AA6E /* TestViewController.m in Sources */,
 				7CD0BFEF1FC2758B00B6E08F /* DrawViewController.m in Sources */,
 				7CD0BFF21FC2793500B6E08F /* DrawView.m in Sources */,
 				7C3521C01FAAEB66009EE03E /* View+MASAdditions.m in Sources */,
 				7C7272441FAAA89B000038B8 /* main.m in Sources */,
 				7C7272361FAAA89B000038B8 /* AppDelegate.m in Sources */,
+				7C711B121FCFA166001074F5 /* PaintProtocols.m in Sources */,
 				7C3521B81FAAEB66009EE03E /* MASCompositeConstraint.m in Sources */,
 				7C3521BF1FAAEB66009EE03E /* NSLayoutConstraint+MASDebugAdditions.m in Sources */,
+				7C711B1C1FCFAEB8001074F5 /* NetDataQueue.m in Sources */,
 				7C7CF5461FCD0B9F0075A289 /* SizeMenuView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -418,7 +476,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VW84V5BAKD;
-				INFOPLIST_FILE = MHKan/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/MHKan/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = yinjianwei.inc.MHKan;
@@ -433,7 +491,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = VW84V5BAKD;
-				INFOPLIST_FILE = MHKan/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/MHKan/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = yinjianwei.inc.MHKan;

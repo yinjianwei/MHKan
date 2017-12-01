@@ -8,7 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol DrawViewDelegate <NSObject>
+
+-(void)beginDraw:(CGPoint)pos;
+-(void)drawMove:(CGPoint)pos;
+-(void)endDraw:(CGPoint)pos;
+
+@end
+
 @interface DrawView : UIView
+
+@property(nonatomic, weak)id<DrawViewDelegate>  delegate;
 
 -(void)clear;
 -(void)useEraser:(BOOL)isUse;
@@ -19,5 +29,11 @@
 
 -(void)setEraserWidth:(CGFloat)width;
 -(CGFloat)getEraserWidth;
+
+-(BOOL)isEraserMode;
+
+-(void)beganDrawWithPos:(CGPoint)pos;
+-(void)drawWithPos:(CGPoint)pos;
+-(void)endDraw;
 
 @end

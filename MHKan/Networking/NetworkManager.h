@@ -7,6 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "ProtocolType.h"
+
+@class BaseProtocols;
 
 //发现新的可连接service时的回调函数
 typedef void(^FindFunc)(void);
@@ -24,14 +27,16 @@ typedef void(^RecvFunc)(NSDictionary*);
 -(void)startServiceWithFindFunc:(FindFunc)findFunc;
 -(void)stopService;
 
--(void)initStreamWithService:(NSNetService*)service;
+-(void)initStreamWithServiceIndex:(NSInteger)index;
 -(void)closeStream;
 
 -(void)setStreamRecvFunc:(RecvFunc)recvFunc;
 -(void)setNewConnetFunc:(ConnetFunc)connectFunc;
 
--(NSArray*)getAllFindServices;
+-(NSArray<NSString*>*)getAllFindServiceNames;
 
--(void)sendData:(NSDictionary*)datas;
+-(void)sendDataWithParams:(id)params;
+
+-(void)registerProcessObjWithType:(BaseProtocols*)processer type:(ProtocolType)protocolType;
 
 @end

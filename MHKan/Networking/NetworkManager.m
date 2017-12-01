@@ -8,13 +8,15 @@
 
 #import "NetworkManager.h"
 #import <UIKit/UIKit.h>
+#import "NetDataQueue.h"
+#import "BaseProtocols.h"
 
-static NSString * kWiTapBonjourType = @"_witap2._tcp.";
+static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
 
 @interface NetworkManager() <NSNetServiceDelegate, NSNetServiceBrowserDelegate, NSStreamDelegate>
 
 @property(nonatomic, strong)NSNetService*   service;
-@property(nonatomic, strong)NSMutableArray* findServices;
+@property(nonatomic, strong)NSMutableArray<NSNetService*>* findServices;
 @property(nonatomic, strong)NSNetServiceBrowser* browser;
 @property(nonatomic, strong)NSInputStream*      inputStream;
 @property(nonatomic, strong)NSOutputStream*     outputStream;
@@ -24,6 +26,9 @@ static NSString * kWiTapBonjourType = @"_witap2._tcp.";
 @property(nonatomic, copy)ConnetFunc    connectFunc;
 @property(nonatomic, copy)RecvFunc      recvFunc;
 @property(nonatomic)NSInteger           streamOpenCount;
+
+@property(nonatomic, strong)NetDataQueue*   dataQueue;
+@property(nonatomic, strong)NSMutableDictionary* protocolProcessers;
 
 @end
 
@@ -55,6 +60,9 @@ static NSString * kWiTapBonjourType = @"_witap2._tcp.";
     self.browser = [[NSNetServiceBrowser alloc] init];
     self.browser.includesPeerToPeer = YES;
     self.browser.delegate = self;
+    
+    self.dataQueue = [[NetDataQueue alloc] init];
+    self.protocolProcessers = [[NSMutableDictionary alloc] init];
 }
 
 #pragma mark - serveice
@@ -93,13 +101,20 @@ static NSString * kWiTapBonjourType = @"_witap2._tcp.";
 
 #pragma mark - NSInputStream & NSOutputStream
 
--(void)initStreamWithService:(NSNetService*)service
+-(void)initStreamWithServiceIndex:(NSInteger)index
 {
     if(self.streamOpenCount > 2)
     {
         NSLog(@"connect stream over 2, can not init!");
         return;
     }
+    
+    if(index < 0 || index >= self.findServices.count)
+    {
+        return;
+    }
+    
+    NSNetService* service = [self.findServices objectAtIndex:index];
     
     NSInputStream *     inStream;
     NSOutputStream *    outStream;
@@ -135,27 +150,33 @@ static NSString * kWiTapBonjourType = @"_witap2._tcp.";
     self.outputStream = nil;
 }
 
--(void)sendData:(NSDictionary*)datas
+-(BOOL)writeData:(NSDictionary*)datas
 {
     if(![self.outputStream hasSpaceAvailable])
     {
         NSLog(@"outputStream not hasSpaceAvailable!");
-        return;
+        return NO;
     }
     
     NSError* error;
+    NSLog(@"send data:%@", datas);
     NSData* data = [NSJSONSerialization dataWithJSONObject:datas options:NSJSONWritingPrettyPrinted error:&error];
     if(error)
     {
         NSLog(@"send data must be json type");
-        return;
+        return NO;
     }
-    
-    NSInteger byteWrite = [self.outputStream write:(const uint8_t *)data.bytes maxLength:data.length];
-    if(byteWrite != data.length)
+    uint8_t length = data.length;
+    NSMutableData* sendData = [NSMutableData dataWithBytes:&length length:sizeof(uint8_t)];
+    [sendData appendData:data];
+    NSInteger byteWrite = [self.outputStream write:(const uint8_t *)sendData.bytes maxLength:sendData.length];
+    if(byteWrite != sendData.length)
     {
         NSLog(@"byte write error: write=%ld, all=%ld", byteWrite, data.length);
+        return NO;
     }
+    
+    return YES;
 }
 
 #pragma mark - NSNetServiceDelegate
@@ -264,19 +285,10 @@ static NSString * kWiTapBonjourType = @"_witap2._tcp.";
         case NSStreamEventHasBytesAvailable:{
             if(aStream == self.inputStream)
             {
-                uint8_t byte[100];
-                NSInteger byteRead = [self.inputStream read:byte maxLength:100];
-                if(byteRead > 0)
-                {
-                    NSData* data = [NSData dataWithBytes:byte length:byteRead];
-                    if(self.recvFunc)
-                    {
-                        NSError* error;
-                        NSDictionary* recvData = (NSDictionary*)[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
-                        NSLog(@"recive data:%@", recvData);
-                        self.recvFunc(recvData);
-                    }
-                }
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                    
+                    [self readData];
+                });
             }
             
         }break;
@@ -292,11 +304,16 @@ static NSString * kWiTapBonjourType = @"_witap2._tcp.";
     }
 }
 
-#pragma mark - self method
+#pragma mark - public method
 
--(NSArray*)getAllFindServices
+-(NSArray<NSString*>*)getAllFindServiceNames
 {
-    return [NSArray arrayWithArray:self.findServices];
+    NSMutableArray* names = [[NSMutableArray alloc] init];
+    for(int i = 0;i < self.findServices.count;i++)
+    {
+        [names addObject:[self.findServices objectAtIndex:i].name];
+    }
+    return [NSArray arrayWithArray:names];
 }
 
 -(void)setStreamRecvFunc:(RecvFunc)recvFunc
@@ -307,6 +324,86 @@ static NSString * kWiTapBonjourType = @"_witap2._tcp.";
 -(void)setNewConnetFunc:(ConnetFunc)connectFunc
 {
     self.connectFunc = connectFunc;
+}
+
+-(void)sendDataWithParams:(id)params
+{
+    if(!self.dataQueue)
+    {
+        return;
+    }
+    
+    [self.dataQueue addNewNetDataWithParams:params];
+    
+    [self sendNetData];
+}
+
+-(void)registerProcessObjWithType:(BaseProtocols *)processer type:(ProtocolType)protocolType
+{
+    id tmpProcesser = [self.protocolProcessers objectForKey:@(protocolType)];
+    if(tmpProcesser)
+    {
+        NSLog(@"already have processer for %ld", protocolType);
+        return;
+    }
+    
+    [self.protocolProcessers setObject:processer forKey:@(protocolType)];
+}
+
+#pragma mark - self method
+
+-(void)sendNetData
+{
+    NetData* data = [self.dataQueue getSendData];
+    if(data && !data.isSend)
+    {
+        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+        dispatch_async(queue, ^{
+            if([self writeData:data.sendDatas])
+            {
+                data.isSend = YES;
+                NSLog(@"send netdata index = %ld", data.dataIndex);
+            }
+        });
+    }
+}
+
+-(void)readData
+{
+    uint8_t dataLength = 0;
+    
+    while([self.inputStream hasBytesAvailable])
+    {
+        //先取数据长度, 获取到数据长度后，如果有可读完整数据则读取数据
+        NSInteger byteRead = [self.inputStream read:&dataLength maxLength:sizeof(uint8_t)];
+        if(byteRead > 0)
+        {
+            uint8_t byte[dataLength];
+            byteRead = [self.inputStream read:byte maxLength:dataLength];
+            if(byteRead == dataLength)
+            {
+                NSData* data = [NSData dataWithBytes:byte length:byteRead];
+                NSError* error;
+                NSDictionary* recvData = (NSDictionary*)[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
+                NSNumber* protocolType = [recvData objectForKey:PROTOCOL_TYPE];
+                NSNumber* processType = [recvData objectForKey:PROCESS_TYPE];
+                NSLog(@"PROTOCOL_TYPE=%@, PROCESS_TYPE=%@", protocolType, processType);
+                BaseProtocols* processer = [self.protocolProcessers objectForKey:protocolType];
+                if(processer)
+                {
+                    [processer processServerData:recvData];
+                }
+            }
+            else
+            {
+                break;
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
 }
 
 @end

@@ -10,6 +10,7 @@
 #import "NetworkManager.h"
 #import "Masonry.h"
 #import "TalkViewController.h"
+#import "DrawViewController.h"
 
 @interface ServiceListViewController () <UITableViewDelegate, UITableViewDataSource>
 
@@ -39,7 +40,7 @@
         [self refreshList];
     }];
     [[NetworkManager sharedManager] setNewConnetFunc:^{
-        [self openTalkViewController];
+        [self openDrawViewController];
     }];
 }
 
@@ -50,31 +51,34 @@
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSArray* datas = [[NetworkManager sharedManager] getAllFindServices];
+    NSArray* datas = [[NetworkManager sharedManager] getAllFindServiceNames];
     return datas.count;
 }
 
 -(UITableViewCell*)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSArray* datas = [[NetworkManager sharedManager] getAllFindServices];
-    NSNetService* data = [datas objectAtIndex:indexPath.row];
+    NSArray* datas = [[NetworkManager sharedManager] getAllFindServiceNames];
     UITableViewCell* cell = [[UITableViewCell alloc] init];
-    cell.textLabel.text = data.name;
+    cell.textLabel.text = [datas objectAtIndex:indexPath.row];
     return cell;
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSArray* datas = [[NetworkManager sharedManager] getAllFindServices];
-    NSNetService* data = [datas objectAtIndex:indexPath.row];
-    [[NetworkManager sharedManager] initStreamWithService:data];
+    [[NetworkManager sharedManager] initStreamWithServiceIndex:indexPath.row];
     
-    [self openTalkViewController];
+    [self openDrawViewController];
 }
 
 -(void)refreshList
 {
     [self.tableView reloadData];
+}
+
+-(void)openDrawViewController
+{
+    DrawViewController* drawVC = [[DrawViewController alloc] init];
+    [self.navigationController pushViewController:drawVC animated:YES];
 }
 
 -(void)openTalkViewController

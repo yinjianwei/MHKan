@@ -8,6 +8,7 @@
 
 #import "DrawView.h"
 #import "Masonry.h"
+#import "PaintProtocols.h"
 
 @interface DrawView()
 
@@ -52,6 +53,7 @@
         }];
         
         self.drawLayer = [CAShapeLayer layer];
+        self.drawLayer.frame = self.frame;
         self.drawLayer.path = [[UIBezierPath alloc] init].CGPath;
         self.drawLayer.strokeColor = [UIColor redColor].CGColor;
         self.drawLayer.fillColor = [UIColor clearColor].CGColor;
@@ -68,47 +70,39 @@
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     CGPoint pos = [[touches anyObject] locationInView:self];
-    if(self.isUseEraser)
+    
+    [self beganDrawWithPos:pos];
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(beginDraw:)])
     {
-        [self.eraserPath moveToPoint:pos];
+        [self.delegate beginDraw:pos];
     }
-    else
-    {
-        [self.drawPath moveToPoint:pos];
-    };
 }
 
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     CGPoint pos = [[touches anyObject] locationInView:self];
-    if(self.isUseEraser)
+    
+    [self drawWithPos:pos];
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(drawMove:)])
     {
-        [self.eraserPath addLineToPoint:pos];
-        UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, 0);
-        [self.drawImage.image drawInRect:self.bounds];
-        [[UIColor colorWithCGColor:self.drawLayer.strokeColor] set];
-        [self.drawPath stroke];
-        [[UIColor clearColor] set];
-        [self.eraserPath strokeWithBlendMode:kCGBlendModeClear alpha:1.0];
-        [self.eraserPath stroke];
-        self.drawImage.image = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
-    }
-    else
-    {
-        [self.drawPath addLineToPoint:pos];
-        self.drawLayer.path = self.drawPath.CGPath;
+        [self.delegate drawMove:pos];
     }
 }
 
 -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
-    [self touchesMoved:touches withEvent:event];
+    CGPoint pos = [[touches anyObject] locationInView:self];
     
-    UIImage* image = [self screenShotWithView:self];
-    self.drawImage.image = image;
+    [self drawWithPos:pos];
     
-    [self clearPath];
+    [self endDraw];
+    
+    if(self.delegate && [self.delegate respondsToSelector:@selector(endDraw:)])
+    {
+        [self.delegate endDraw:pos];
+    }
 }
 
 #pragma mark - public method
@@ -148,6 +142,53 @@
 -(CGFloat)getEraserWidth
 {
     return self.eraserPath.lineWidth;
+}
+
+-(BOOL)isEraserMode
+{
+    return self.isUseEraser;
+}
+
+-(void)beganDrawWithPos:(CGPoint)pos
+{
+    if(self.isUseEraser)
+    {
+        [self.eraserPath moveToPoint:pos];
+    }
+    else
+    {
+        [self.drawPath moveToPoint:pos];
+    };
+}
+
+-(void)drawWithPos:(CGPoint)pos
+{
+    if(self.isUseEraser)
+    {
+        [self.eraserPath addLineToPoint:pos];
+        UIGraphicsBeginImageContextWithOptions(self.frame.size, NO, 0);
+        [self.drawImage.image drawInRect:self.bounds];
+        [[UIColor colorWithCGColor:self.drawLayer.strokeColor] set];
+        [self.drawPath stroke];
+        [[UIColor clearColor] set];
+        [self.eraserPath strokeWithBlendMode:kCGBlendModeClear alpha:1.0];
+        [self.eraserPath stroke];
+        self.drawImage.image = UIGraphicsGetImageFromCurrentImageContext();
+        UIGraphicsEndImageContext();
+    }
+    else
+    {
+        [self.drawPath addLineToPoint:pos];
+        self.drawLayer.path = self.drawPath.CGPath;
+    }
+}
+
+-(void)endDraw
+{
+    UIImage* image = [self screenShotWithView:self];
+    self.drawImage.image = image;
+    
+//    [self clearPath];
 }
 
 #pragma mark - self method

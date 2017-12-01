@@ -10,8 +10,10 @@
 #import "Masonry.h"
 #import "DrawView.h"
 #import "SizeMenuView.h"
+#import "PaintProtocols.h"
+#import "ProtocolType.h"
 
-@interface DrawViewController () <SizeMenuViewDelegate>
+@interface DrawViewController () <SizeMenuViewDelegate, DrawViewDelegate, BaseProtocolsDelegate>
 
 @property(nonatomic, strong)DrawView*       drawView;
 @property(nonatomic, strong)UIView*         functionAreaView;
@@ -56,12 +58,15 @@
     self.edgesForExtendedLayout = UIRectEdgeNone;
     
     [self setupUI];
+    
+    [[PaintProtocols sharedProtols] registerProcessObj:self];
 }
 
 -(void)setupUI
 {
     self.drawView = [[DrawView alloc] init];
     self.drawView.backgroundColor = [UIColor whiteColor];
+    self.drawView.delegate = self;
     [self.view addSubview:self.drawView];
     if (@available(iOS 11.0, *))
     {
@@ -186,6 +191,65 @@
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     [self showSizeMenuViewWithFuncImage:nil];
+}
+
+#pragma mark - BaseProtocolsDelegate
+
+-(void)processServerData:(NSDictionary *)serverData
+{
+    NSNumber* processType = [serverData objectForKey:PROCESS_TYPE];
+    switch (processType.integerValue) {
+        case ProcessTypeStartDraw:
+        {
+            NSNumber* eraserValue = [serverData objectForKey:@"isEraser"];
+            [self.drawView useEraser:eraserValue.boolValue];
+            NSString* posValue = [serverData objectForKey:@"pos"];
+            CGPoint pos = CGPointFromString(posValue);
+            [self.drawView beganDrawWithPos:pos];
+        }
+            break;
+        case ProcessTypeDrawPos:
+        {
+            NSNumber* eraserValue = [serverData objectForKey:@"isEraser"];
+            [self.drawView useEraser:eraserValue.boolValue];
+            NSString* posValue = [serverData objectForKey:@"pos"];
+            CGPoint pos = CGPointFromString(posValue);
+            [self.drawView drawWithPos:pos];
+        }
+        case ProcessTypeEndDraw:
+        {
+            NSNumber* eraserValue = [serverData objectForKey:@"isEraser"];
+            [self.drawView useEraser:eraserValue.boolValue];
+            NSString* posValue = [serverData objectForKey:@"pos"];
+            CGPoint pos = CGPointFromString(posValue);
+            [self.drawView drawWithPos:pos];
+            [self.drawView endDraw];
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+#pragma mark - DrawViewDelegate
+
+-(void)beginDraw:(CGPoint)pos
+{
+    NSDictionary* params = @{@"pos":NSStringFromCGPoint(pos), @"isEraser":@([self.drawView isEraserMode])};
+    [[PaintProtocols sharedProtols] startDrawWithParams:params];
+}
+
+-(void)drawMove:(CGPoint)pos
+{
+    NSDictionary* params = @{@"pos":NSStringFromCGPoint(pos), @"isEraser":@([self.drawView isEraserMode])};
+    [[PaintProtocols sharedProtols] drawWithParams:params];
+}
+
+-(void)endDraw:(CGPoint)pos
+{
+    NSDictionary* params = @{@"pos":NSStringFromCGPoint(pos), @"isEraser":@([self.drawView isEraserMode])};
+    [[PaintProtocols sharedProtols] endDrawWithParams:params];
 }
 
 #pragma mark - SizeMenuViewDelegate
