@@ -11,7 +11,7 @@
 
 @interface NetDataQueue : NSObject
 
--(void)addNewNetDataWithParams:(id)params;
+-(BOOL)addNewNetDataWithParams:(id)params;
 -(NetData*)getSendData;
 
 @end

@@ -10,6 +10,10 @@
 #import "Masonry.h"
 #import "PaintProtocols.h"
 
+const NSString* start_pos = @"startPos";
+const NSString* move_pos = @"movePos";
+const NSString* end_pos = @"endPos";
+
 @interface DrawView()
 
 @property(nonatomic, strong)NSMutableArray*     points;
@@ -20,6 +24,7 @@
 @property(nonatomic, strong)UIImageView*        backImage;
 
 @property(nonatomic)BOOL                        isUseEraser;
+@property(nonatomic, strong)NSMutableDictionary*     drawPosDict;
 
 @end
 
@@ -32,6 +37,10 @@
     {
         self.layer.masksToBounds = YES;
         self.isUseEraser = NO;
+        self.drawPosDict = [[NSMutableDictionary alloc] init];
+        [self.drawPosDict setObject:@"" forKey:start_pos];
+        [self.drawPosDict setObject:[[NSMutableArray alloc] init] forKey:move_pos];
+        [self.drawPosDict setObject:@"" forKey:end_pos];
         
         self.drawPath = [[UIBezierPath alloc] init];
         self.drawLayer.lineWidth = 5;
@@ -61,6 +70,9 @@
         self.drawLayer.lineCap = kCALineCapRound;
         self.drawLayer.lineWidth = 5;
         [self.drawImage.layer addSublayer:self.drawLayer];
+        
+        CADisplayLink* displaylink = [CADisplayLink displayLinkWithTarget:self selector:@selector(displaylink:)];
+        [displaylink addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     }
     return self;
 }
@@ -71,11 +83,13 @@
 {
     CGPoint pos = [[touches anyObject] locationInView:self];
     
-    [self beganDrawWithPos:pos];
+    [self.drawPosDict setObject:NSStringFromCGPoint(pos) forKey:start_pos];
     
     if(self.delegate && [self.delegate respondsToSelector:@selector(beginDraw:)])
     {
-        [self.delegate beginDraw:pos];
+        CGSize size = self.frame.size;
+        CGPoint newPos = CGPointMake(pos.x/size.width, pos.y/size.height);
+        [self.delegate beginDraw:newPos];
     }
 }
 
@@ -83,11 +97,15 @@
 {
     CGPoint pos = [[touches anyObject] locationInView:self];
     
-    [self drawWithPos:pos];
+    NSMutableArray* ary = [self.drawPosDict objectForKey:move_pos];
+    [ary addObject:NSStringFromCGPoint(pos)];
+    [self.drawPosDict setObject:ary forKey:move_pos];
     
     if(self.delegate && [self.delegate respondsToSelector:@selector(drawMove:)])
     {
-        [self.delegate drawMove:pos];
+        CGSize size = self.frame.size;
+        CGPoint newPos = CGPointMake(pos.x/size.width, pos.y/size.height);
+        [self.delegate drawMove:newPos];
     }
 }
 
@@ -95,13 +113,13 @@
 {
     CGPoint pos = [[touches anyObject] locationInView:self];
     
-    [self drawWithPos:pos];
-    
-    [self endDraw];
+    [self.drawPosDict setObject:NSStringFromCGPoint(pos) forKey:end_pos];
     
     if(self.delegate && [self.delegate respondsToSelector:@selector(endDraw:)])
     {
-        [self.delegate endDraw:pos];
+        CGSize size = self.frame.size;
+        CGPoint newPos = CGPointMake(pos.x/size.width, pos.y/size.height);
+        [self.delegate endDraw:newPos];
     }
 }
 
@@ -149,8 +167,29 @@
     return self.isUseEraser;
 }
 
+-(void)setStartPos:(CGPoint)pos
+{
+    [self.drawPosDict setObject:NSStringFromCGPoint(pos) forKey:start_pos];
+}
+
+-(void)addMoveToPos:(CGPoint)pos
+{
+    NSMutableArray* ary = [self.drawPosDict objectForKey:move_pos];
+    [ary addObject:NSStringFromCGPoint(pos)];
+    [self.drawPosDict setObject:ary forKey:move_pos];
+}
+
+-(void)setEndPos:(CGPoint)pos
+{
+    [self.drawPosDict setObject:NSStringFromCGPoint(pos) forKey:end_pos];
+}
+
+#pragma mark - self method
+
 -(void)beganDrawWithPos:(CGPoint)pos
 {
+    [self clearPath];
+    
     if(self.isUseEraser)
     {
         [self.eraserPath moveToPoint:pos];
@@ -187,11 +226,34 @@
 {
     UIImage* image = [self screenShotWithView:self];
     self.drawImage.image = image;
-    
-//    [self clearPath];
 }
 
-#pragma mark - self method
+-(void)displaylink:(CADisplayLink *)sender
+{
+    NSString* startPos = [self.drawPosDict objectForKey:start_pos];
+    if(![startPos isEqualToString:@""])
+    {
+        [self beganDrawWithPos:CGPointFromString(startPos)];
+        [self.drawPosDict setObject:@"" forKey:start_pos];
+    }
+    
+    NSMutableArray* ary = [self.drawPosDict objectForKey:move_pos];
+    if(ary.count > 0)
+    {
+        CGPoint pos = CGPointFromString([ary objectAtIndex:0]);
+        [self drawWithPos:pos];
+        [ary removeObjectAtIndex:0];
+        [self.drawPosDict setObject:ary forKey:move_pos];
+    }
+    
+    NSString* endPos = [self.drawPosDict objectForKey:end_pos];
+    if(ary.count <= 0 && ![endPos isEqualToString:@""])
+    {
+        [self drawWithPos:CGPointFromString(endPos)];
+        [self endDraw];
+        [self.drawPosDict setObject:@"" forKey:end_pos];
+    }
+}
 
 -(void)clearPath
 {

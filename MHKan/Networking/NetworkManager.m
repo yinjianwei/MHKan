@@ -14,6 +14,9 @@
 static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
 
 @interface NetworkManager() <NSNetServiceDelegate, NSNetServiceBrowserDelegate, NSStreamDelegate>
+{
+    dispatch_semaphore_t semaphore;
+}
 
 @property(nonatomic, strong)NSNetService*   service;
 @property(nonatomic, strong)NSMutableArray<NSNetService*>* findServices;
@@ -26,6 +29,8 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
 @property(nonatomic, copy)ConnetFunc    connectFunc;
 @property(nonatomic, copy)RecvFunc      recvFunc;
 @property(nonatomic)NSInteger           streamOpenCount;
+
+@property(nonatomic, strong)NSMutableData*      tmpData;    //用于接收未传送完的数据
 
 @property(nonatomic, strong)NetDataQueue*   dataQueue;
 @property(nonatomic, strong)NSMutableDictionary* protocolProcessers;
@@ -50,6 +55,7 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
 {
     self.isServiceStart = NO;
     self.streamOpenCount = 0;
+    self.tmpData = nil;
     
     self.service = [[NSNetService alloc] initWithDomain:@"local." type:kWiTapBonjourType name:[UIDevice currentDevice].name port:0];
     self.service.includesPeerToPeer = YES;
@@ -63,6 +69,8 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
     
     self.dataQueue = [[NetDataQueue alloc] init];
     self.protocolProcessers = [[NSMutableDictionary alloc] init];
+    
+    semaphore = dispatch_semaphore_create(1);
 }
 
 #pragma mark - serveice
@@ -243,7 +251,7 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
         [self.findServices removeObject:service];
     }
     
-    if(!moreComing)
+    if(!moreComing && self.findFunc)
     {
         self.findFunc();
     }
@@ -286,8 +294,9 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
             if(aStream == self.inputStream)
             {
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    
+                    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
                     [self readData];
+                    dispatch_semaphore_signal(semaphore);
                 });
             }
             
@@ -333,9 +342,10 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
         return;
     }
     
-    [self.dataQueue addNewNetDataWithParams:params];
-    
-    [self sendNetData];
+    if([self.dataQueue addNewNetDataWithParams:params])
+    {
+        [self sendNetData];
+    }
 }
 
 -(void)registerProcessObjWithType:(BaseProtocols *)processer type:(ProtocolType)protocolType
@@ -355,16 +365,15 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
 -(void)sendNetData
 {
     NetData* data = [self.dataQueue getSendData];
-    if(data && !data.isSend)
+    if(data)
     {
-        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-        dispatch_async(queue, ^{
+//        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+//        dispatch_async(queue, ^{
             if([self writeData:data.sendDatas])
             {
                 data.isSend = YES;
-                NSLog(@"send netdata index = %ld", data.dataIndex);
             }
-        });
+//        });
     }
 }
 
@@ -374,25 +383,43 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
     
     while([self.inputStream hasBytesAvailable])
     {
-        //先取数据长度, 获取到数据长度后，如果有可读完整数据则读取数据
+        //先判断是否有上次未读完的数据，然后取数据长度, 获取到数据长度后，如果有可读完整数据则读取数据
+        if(self.tmpData && self.tmpData.length > 0)
+        {
+            NSInteger unreadLength = self.tmpData.length - sizeof(self.tmpData.mutableBytes);
+            
+            uint8_t unreadByte[unreadLength];
+            NSInteger byteRead = [self.inputStream read:unreadByte maxLength:unreadLength];
+            if(byteRead == unreadLength)
+            {
+                [self.tmpData appendBytes:unreadByte length:byteRead];
+                [self processReciveData:self.tmpData];
+                self.tmpData = NULL;
+            }
+        }
+        
         NSInteger byteRead = [self.inputStream read:&dataLength maxLength:sizeof(uint8_t)];
         if(byteRead > 0)
         {
-            uint8_t byte[dataLength];
-            byteRead = [self.inputStream read:byte maxLength:dataLength];
+            uint8_t readByte[dataLength];
+            byteRead = [self.inputStream read:readByte maxLength:dataLength];
             if(byteRead == dataLength)
             {
-                NSData* data = [NSData dataWithBytes:byte length:byteRead];
-                NSError* error;
-                NSDictionary* recvData = (NSDictionary*)[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
-                NSNumber* protocolType = [recvData objectForKey:PROTOCOL_TYPE];
-                NSNumber* processType = [recvData objectForKey:PROCESS_TYPE];
-                NSLog(@"PROTOCOL_TYPE=%@, PROCESS_TYPE=%@", protocolType, processType);
-                BaseProtocols* processer = [self.protocolProcessers objectForKey:protocolType];
-                if(processer)
-                {
-                    [processer processServerData:recvData];
-                }
+                NSData* data = [NSData dataWithBytes:readByte length:byteRead];
+                [self processReciveData:data];
+            }
+            else if(byteRead < 0)
+            {
+                NSLog(@"read data error!");
+                break;
+            }
+            else if(byteRead < dataLength)
+            {
+                uint8_t readByte[dataLength];
+                byteRead = [self.inputStream read:readByte maxLength:byteRead];
+                self.tmpData = [NSMutableData dataWithLength:dataLength];
+                [self.tmpData appendBytes:readByte length:byteRead];
+                break;
             }
             else
             {
@@ -403,6 +430,24 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
         {
             break;
         }
+        dataLength = 0;
+    }
+}
+
+-(void)processReciveData:(NSData*)data
+{
+    NSError* error;
+    NSDictionary* recvData = (NSDictionary*)[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
+    NSNumber* protocolType = [recvData objectForKey:PROTOCOL_TYPE];
+    NSNumber* processType = [recvData objectForKey:PROCESS_TYPE];
+    if(!processType || !processType)
+    {
+        NSLog(@"recvData:%@", recvData);
+    }
+    BaseProtocols* processer = [self.protocolProcessers objectForKey:protocolType];
+    if(processer)
+    {
+        [processer processServerData:recvData];
     }
 }
 

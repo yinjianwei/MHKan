@@ -32,8 +32,8 @@
 
 -(BOOL)isEraserMode;
 
--(void)beganDrawWithPos:(CGPoint)pos;
--(void)drawWithPos:(CGPoint)pos;
--(void)endDraw;
+-(void)setStartPos:(CGPoint)pos;
+-(void)addMoveToPos:(CGPoint)pos;
+-(void)setEndPos:(CGPoint)pos;
 
 @end

@@ -205,7 +205,10 @@
             [self.drawView useEraser:eraserValue.boolValue];
             NSString* posValue = [serverData objectForKey:@"pos"];
             CGPoint pos = CGPointFromString(posValue);
-            [self.drawView beganDrawWithPos:pos];
+            CGSize size = self.drawView.frame.size;
+            pos.x = size.width * pos.x;
+            pos.y = size.height * pos.y;
+            [self.drawView setStartPos:pos];
         }
             break;
         case ProcessTypeDrawPos:
@@ -214,7 +217,10 @@
             [self.drawView useEraser:eraserValue.boolValue];
             NSString* posValue = [serverData objectForKey:@"pos"];
             CGPoint pos = CGPointFromString(posValue);
-            [self.drawView drawWithPos:pos];
+            CGSize size = self.drawView.frame.size;
+            pos.x = size.width * pos.x;
+            pos.y = size.height * pos.y;
+            [self.drawView addMoveToPos:pos];
         }
         case ProcessTypeEndDraw:
         {
@@ -222,8 +228,10 @@
             [self.drawView useEraser:eraserValue.boolValue];
             NSString* posValue = [serverData objectForKey:@"pos"];
             CGPoint pos = CGPointFromString(posValue);
-            [self.drawView drawWithPos:pos];
-            [self.drawView endDraw];
+            CGSize size = self.drawView.frame.size;
+            pos.x = size.width * pos.x;
+            pos.y = size.height * pos.y;
+            [self.drawView setEndPos:pos];
         }
             break;
             

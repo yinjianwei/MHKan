@@ -27,7 +27,7 @@
     return self;
 }
 
--(void)addNewNetDataWithParams:(id)params
+-(BOOL)addNewNetDataWithParams:(id)params
 {
     [self removeSendedData];
     
@@ -39,16 +39,28 @@
     {
         if(data.dataIndex == newData.dataIndex)
         {
-            return;
+            return NO;
         }
     }
     
     [self.dataQueue addObject:newData];
+    return YES;
 }
 
 -(NetData*)getSendData
 {
-    return [self.dataQueue objectAtIndex:0];
+    if(self.dataQueue.count < 1)
+    {
+        return NULL;
+    }
+    
+    NSInteger index = 0;
+    NetData* data = [self.dataQueue objectAtIndex:index];
+    while(data && data.isSend)
+    {
+        data = [self.dataQueue objectAtIndex:++index];
+    }
+    return data;
 }
 
 -(void)removeSendedData
