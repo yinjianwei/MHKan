@@ -15,6 +15,9 @@
 
 @interface AppDelegate ()
 
+@property(nonatomic, strong)NSString*   tmp1;
+@property(nonatomic, copy)NSString*   tmp2;
+
 @end
 
 @implementation AppDelegate

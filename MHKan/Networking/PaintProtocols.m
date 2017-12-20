@@ -12,16 +12,16 @@
 
 @implementation PaintProtocols
 
-+(instancetype)sharedProtols
++(instancetype)sharedProtocols
 {
-    static PaintProtocols* sharedProtols;
+    static PaintProtocols* sharedProtocols;
     static dispatch_once_t predicate;
     dispatch_once(&predicate, ^{
-        sharedProtols = [[PaintProtocols alloc] init];
-        [sharedProtols initProtocols];
+        sharedProtocols = [[PaintProtocols alloc] init];
+        [sharedProtocols initProtocols];
     });
     
-    return sharedProtols;
+    return sharedProtocols;
 }
 
 -(void)initProtocols
@@ -29,18 +29,6 @@
     [super initProtocols];
     
     [[NetworkManager sharedManager] registerProcessObjWithType:self type:ProtocolTypeDraw];
-}
-
--(void)startDrawWithParams:(NSDictionary *)param
-{
-    NSMutableDictionary* newParam = [[NSMutableDictionary alloc] init];
-    for(NSString* key in param)
-    {
-        [newParam setObject:[param objectForKey:key] forKey:key];
-    }
-    [newParam setObject:@(ProtocolTypeDraw) forKey:PROTOCOL_TYPE];
-    [newParam setObject:@(ProcessTypeStartDraw) forKey:PROCESS_TYPE];
-    [[NetworkManager sharedManager] sendDataWithParams:newParam];
 }
 
 -(void)drawWithParams:(NSDictionary *)param
@@ -51,11 +39,11 @@
         [newParam setObject:[param objectForKey:key] forKey:key];
     }
     [newParam setObject:@(ProtocolTypeDraw) forKey:PROTOCOL_TYPE];
-    [newParam setObject:@(ProcessTypeDrawPos) forKey:PROCESS_TYPE];
+    [newParam setObject:@(ProcessTypeDraw) forKey:PROCESS_TYPE];
     [[NetworkManager sharedManager] sendDataWithParams:newParam];
 }
 
--(void)endDrawWithParams:(NSDictionary *)param
+-(void)clearDrawWithParam:(NSDictionary *)param
 {
     NSMutableDictionary* newParam = [[NSMutableDictionary alloc] init];
     for(NSString* key in param)
@@ -63,7 +51,7 @@
         [newParam setObject:[param objectForKey:key] forKey:key];
     }
     [newParam setObject:@(ProtocolTypeDraw) forKey:PROTOCOL_TYPE];
-    [newParam setObject:@(ProcessTypeEndDraw) forKey:PROCESS_TYPE];
+    [newParam setObject:@(ProcessTypeClear) forKey:PROCESS_TYPE];
     [[NetworkManager sharedManager] sendDataWithParams:newParam];
 }
 

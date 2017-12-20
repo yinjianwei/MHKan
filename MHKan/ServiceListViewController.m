@@ -36,11 +36,18 @@
         make.edges.equalTo(self.view);
     }];
     
-    [[NetworkManager sharedManager] startServiceWithFindFunc:^{
-        [self refreshList];
-    }];
     [[NetworkManager sharedManager] setNewConnetFunc:^{
         [self openDrawViewController];
+    }];
+}
+
+-(void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    [[NetworkManager sharedManager] closeStream];
+    [[NetworkManager sharedManager] startServiceWithFindFunc:^{
+        [self refreshList];
     }];
 }
 

@@ -57,9 +57,14 @@
     self.view.backgroundColor = [UIColor colorWithRed:0.9 green:0.9 blue:0.9 alpha:1];
     self.edgesForExtendedLayout = UIRectEdgeNone;
     
+    if([self.navigationController respondsToSelector:@selector(interactivePopGestureRecognizer)])
+    {
+        self.navigationController.interactivePopGestureRecognizer.enabled = NO;
+    }
+    
     [self setupUI];
     
-    [[PaintProtocols sharedProtols] registerProcessObj:self];
+    [[PaintProtocols sharedProtocols] registerProcessObj:self];
 }
 
 -(void)setupUI
@@ -150,6 +155,8 @@
     [alertVC addAction:[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil]];
     [alertVC addAction:[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self.drawView clear];
+        
+        [[PaintProtocols sharedProtocols] clearDrawWithParam:@{}];
     }]];
     [self presentViewController:alertVC animated:YES completion:nil];
 }
@@ -199,39 +206,27 @@
 {
     NSNumber* processType = [serverData objectForKey:PROCESS_TYPE];
     switch (processType.integerValue) {
-        case ProcessTypeStartDraw:
+        case ProcessTypeDraw:
         {
             NSNumber* eraserValue = [serverData objectForKey:@"isEraser"];
-            [self.drawView useEraser:eraserValue.boolValue];
+            NSNumber* indexValue = [serverData objectForKey:@"index"];
+            NSUInteger index = indexValue.unsignedIntegerValue;
+            NSNumber* pointTypeValue = [serverData objectForKey:@"pointType"];
+            PointType pointType = pointTypeValue.integerValue;
             NSString* posValue = [serverData objectForKey:@"pos"];
             CGPoint pos = CGPointFromString(posValue);
+            
+            [self.drawView useEraser:eraserValue.boolValue];
+            
             CGSize size = self.drawView.frame.size;
             pos.x = size.width * pos.x;
             pos.y = size.height * pos.y;
-            [self.drawView setStartPos:pos];
+            [self.drawView addDrawDataWithPos:pos index:index type:pointType];
         }
             break;
-        case ProcessTypeDrawPos:
+        case ProcessTypeClear:
         {
-            NSNumber* eraserValue = [serverData objectForKey:@"isEraser"];
-            [self.drawView useEraser:eraserValue.boolValue];
-            NSString* posValue = [serverData objectForKey:@"pos"];
-            CGPoint pos = CGPointFromString(posValue);
-            CGSize size = self.drawView.frame.size;
-            pos.x = size.width * pos.x;
-            pos.y = size.height * pos.y;
-            [self.drawView addMoveToPos:pos];
-        }
-        case ProcessTypeEndDraw:
-        {
-            NSNumber* eraserValue = [serverData objectForKey:@"isEraser"];
-            [self.drawView useEraser:eraserValue.boolValue];
-            NSString* posValue = [serverData objectForKey:@"pos"];
-            CGPoint pos = CGPointFromString(posValue);
-            CGSize size = self.drawView.frame.size;
-            pos.x = size.width * pos.x;
-            pos.y = size.height * pos.y;
-            [self.drawView setEndPos:pos];
+            [self.drawView clear];
         }
             break;
             
@@ -242,22 +237,10 @@
 
 #pragma mark - DrawViewDelegate
 
--(void)beginDraw:(CGPoint)pos
+-(void)drawWithPos:(CGPoint)pos index:(NSUInteger)index type:(PointType)type
 {
-    NSDictionary* params = @{@"pos":NSStringFromCGPoint(pos), @"isEraser":@([self.drawView isEraserMode])};
-    [[PaintProtocols sharedProtols] startDrawWithParams:params];
-}
-
--(void)drawMove:(CGPoint)pos
-{
-    NSDictionary* params = @{@"pos":NSStringFromCGPoint(pos), @"isEraser":@([self.drawView isEraserMode])};
-    [[PaintProtocols sharedProtols] drawWithParams:params];
-}
-
--(void)endDraw:(CGPoint)pos
-{
-    NSDictionary* params = @{@"pos":NSStringFromCGPoint(pos), @"isEraser":@([self.drawView isEraserMode])};
-    [[PaintProtocols sharedProtols] endDrawWithParams:params];
+    NSDictionary* param = @{@"pos":NSStringFromCGPoint(pos), @"isEraser":@([self.drawView isEraserMode]), @"index":@(index), @"pointType":@(type)};
+    [[PaintProtocols sharedProtocols] drawWithParams:param];
 }
 
 #pragma mark - SizeMenuViewDelegate

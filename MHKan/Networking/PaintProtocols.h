@@ -11,10 +11,9 @@
 
 @interface PaintProtocols : BaseProtocols
 
-+(instancetype)sharedProtols;
++(instancetype)sharedProtocols;
 
--(void)startDrawWithParams:(NSDictionary*)param;
 -(void)drawWithParams:(NSDictionary*)param;
--(void)endDrawWithParams:(NSDictionary*)param;
+-(void)clearDrawWithParam:(NSDictionary*)param;
 
 @end

@@ -32,7 +32,9 @@
 		7C7272411FAAA89B000038B8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7C72723F1FAAA89B000038B8 /* LaunchScreen.storyboard */; };
 		7C7272441FAAA89B000038B8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7272431FAAA89B000038B8 /* main.m */; };
 		7C7273F41FAAAA5E000038B8 /* ViewMHViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7273F31FAAAA5E000038B8 /* ViewMHViewController.m */; };
+		7C7C40DD1FE75345008BA0A9 /* DrawData.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7C40DC1FE75345008BA0A9 /* DrawData.m */; };
 		7C7CF5461FCD0B9F0075A289 /* SizeMenuView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7CF5451FCD0B9F0075A289 /* SizeMenuView.m */; };
+		7C7D98651FDE2E3700CD27B2 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 7C7D98641FDE2E3700CD27B2 /* Utils.m */; };
 		7C9157871FCBBD98009D867F /* city.js in Resources */ = {isa = PBXBuildFile; fileRef = 7C9157861FCBBD98009D867F /* city.js */; };
 		7CD0BFEF1FC2758B00B6E08F /* DrawViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */; };
 		7CD0BFF21FC2793500B6E08F /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7CD0BFF11FC2793500B6E08F /* DrawView.m */; };
@@ -93,8 +95,12 @@
 		7C7272431FAAA89B000038B8 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		7C7273F21FAAAA5E000038B8 /* ViewMHViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewMHViewController.h; sourceTree = "<group>"; };
 		7C7273F31FAAAA5E000038B8 /* ViewMHViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewMHViewController.m; sourceTree = "<group>"; };
+		7C7C40DB1FE75345008BA0A9 /* DrawData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrawData.h; sourceTree = "<group>"; };
+		7C7C40DC1FE75345008BA0A9 /* DrawData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DrawData.m; sourceTree = "<group>"; };
 		7C7CF5441FCD0B9F0075A289 /* SizeMenuView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SizeMenuView.h; sourceTree = "<group>"; };
 		7C7CF5451FCD0B9F0075A289 /* SizeMenuView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SizeMenuView.m; sourceTree = "<group>"; };
+		7C7D98631FDE2E3700CD27B2 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		7C7D98641FDE2E3700CD27B2 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		7C9157861FCBBD98009D867F /* city.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = city.js; sourceTree = "<group>"; };
 		7CD0BFED1FC2758B00B6E08F /* DrawViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DrawViewController.h; sourceTree = "<group>"; };
 		7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DrawViewController.m; sourceTree = "<group>"; };
@@ -227,6 +233,8 @@
 				7C1CE4571FBE760400BA9CE2 /* ServiceListViewController.m */,
 				7C2B45A01FD14F9800D7AA6E /* TestViewController.h */,
 				7C2B45A11FD14F9800D7AA6E /* TestViewController.m */,
+				7C7D98631FDE2E3700CD27B2 /* Utils.h */,
+				7C7D98641FDE2E3700CD27B2 /* Utils.m */,
 			);
 			path = MHKan;
 			sourceTree = "<group>";
@@ -239,9 +247,19 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		7C7C40DA1FE7532F008BA0A9 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				7C7C40DB1FE75345008BA0A9 /* DrawData.h */,
+				7C7C40DC1FE75345008BA0A9 /* DrawData.m */,
+			);
+			path = Data;
+			sourceTree = "<group>";
+		};
 		7C7CF5431FCD0B500075A289 /* Paint */ = {
 			isa = PBXGroup;
 			children = (
+				7C7C40DA1FE7532F008BA0A9 /* Data */,
 				7CD0BFED1FC2758B00B6E08F /* DrawViewController.h */,
 				7CD0BFEE1FC2758B00B6E08F /* DrawViewController.m */,
 				7CD0BFF01FC2793500B6E08F /* DrawView.h */,
@@ -327,6 +345,7 @@
 				7C2E82B61FBD1EA60068A7B4 /* NetworkManager.m in Sources */,
 				7C3521BA1FAAEB66009EE03E /* MASConstraintMaker.m in Sources */,
 				7C711B201FD005B4001074F5 /* BaseProtocols.m in Sources */,
+				7C7D98651FDE2E3700CD27B2 /* Utils.m in Sources */,
 				7C7273F41FAAAA5E000038B8 /* ViewMHViewController.m in Sources */,
 				7C7272391FAAA89B000038B8 /* ViewController.m in Sources */,
 				7C3521B91FAAEB66009EE03E /* MASConstraint.m in Sources */,
@@ -334,6 +353,7 @@
 				7C3521BB1FAAEB66009EE03E /* MASLayoutConstraint.m in Sources */,
 				7C1CE4581FBE760400BA9CE2 /* ServiceListViewController.m in Sources */,
 				7C3521BE1FAAEB66009EE03E /* NSArray+MASAdditions.m in Sources */,
+				7C7C40DD1FE75345008BA0A9 /* DrawData.m in Sources */,
 				7C1CE45B1FBE828300BA9CE2 /* TalkViewController.m in Sources */,
 				7C3521BD1FAAEB66009EE03E /* MASViewConstraint.m in Sources */,
 				7C711B191FCFA5EF001074F5 /* NetData.m in Sources */,

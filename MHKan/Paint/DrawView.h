@@ -7,12 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DrawData.h"
 
 @protocol DrawViewDelegate <NSObject>
 
--(void)beginDraw:(CGPoint)pos;
--(void)drawMove:(CGPoint)pos;
--(void)endDraw:(CGPoint)pos;
+-(void)drawWithPos:(CGPoint)pos index:(NSUInteger)index type:(PointType)type;
 
 @end
 
@@ -32,8 +31,6 @@
 
 -(BOOL)isEraserMode;
 
--(void)setStartPos:(CGPoint)pos;
--(void)addMoveToPos:(CGPoint)pos;
--(void)setEndPos:(CGPoint)pos;
+-(void)addDrawDataWithPos:(CGPoint)pos index:(NSUInteger)index type:(PointType)type;
 
 @end

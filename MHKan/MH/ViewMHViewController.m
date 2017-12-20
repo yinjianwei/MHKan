@@ -136,13 +136,13 @@
     
     if(self.curPage > 0)
     {
-        fileName = [NSString stringWithFormat:@"img%ld", self.curPage-1];
+        fileName = [NSString stringWithFormat:@"img%d", self.curPage-1];
         path = [[NSBundle mainBundle] pathForResource:fileName ofType:@"jpg"];
         data = [NSData dataWithContentsOfFile:path];
         self.leftImageView.image = [UIImage imageWithData:data];
     }
     
-    fileName = [NSString stringWithFormat:@"img%ld", self.curPage+1];
+    fileName = [NSString stringWithFormat:@"img%d", self.curPage+1];
     path = [[NSBundle mainBundle] pathForResource:fileName ofType:@"jpg"];
     data = [NSData dataWithContentsOfFile:path];
     if(data)

@@ -9,10 +9,7 @@
 #import "DrawView.h"
 #import "Masonry.h"
 #import "PaintProtocols.h"
-
-const NSString* start_pos = @"startPos";
-const NSString* move_pos = @"movePos";
-const NSString* end_pos = @"endPos";
+#import "Utils.h"
 
 @interface DrawView()
 
@@ -24,7 +21,9 @@ const NSString* end_pos = @"endPos";
 @property(nonatomic, strong)UIImageView*        backImage;
 
 @property(nonatomic)BOOL                        isUseEraser;
-@property(nonatomic, strong)NSMutableDictionary*     drawPosDict;
+@property(nonatomic, strong)NSMutableArray*     drawDataAry;
+
+//@property(nonatomic)NSUInteger                  lastDrawIndex;
 
 @end
 
@@ -37,10 +36,8 @@ const NSString* end_pos = @"endPos";
     {
         self.layer.masksToBounds = YES;
         self.isUseEraser = NO;
-        self.drawPosDict = [[NSMutableDictionary alloc] init];
-        [self.drawPosDict setObject:@"" forKey:start_pos];
-        [self.drawPosDict setObject:[[NSMutableArray alloc] init] forKey:move_pos];
-        [self.drawPosDict setObject:@"" forKey:end_pos];
+        self.drawDataAry = [[NSMutableArray alloc] init];
+//        self.lastDrawIndex = 0;
         
         self.drawPath = [[UIBezierPath alloc] init];
         self.drawLayer.lineWidth = 5;
@@ -82,44 +79,42 @@ const NSString* end_pos = @"endPos";
 -(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     CGPoint pos = [[touches anyObject] locationInView:self];
+    NSUInteger index = [Utils getIncreaseIndex];
+    [self addDrawDataWithPos:pos index:index type:PointTypeBegan];
     
-    [self.drawPosDict setObject:NSStringFromCGPoint(pos) forKey:start_pos];
-    
-    if(self.delegate && [self.delegate respondsToSelector:@selector(beginDraw:)])
+    if(self.delegate && [self.delegate respondsToSelector:@selector(drawWithPos:index:type:)])
     {
         CGSize size = self.frame.size;
         CGPoint newPos = CGPointMake(pos.x/size.width, pos.y/size.height);
-        [self.delegate beginDraw:newPos];
+        [self.delegate drawWithPos:newPos index:index type:PointTypeBegan];
     }
 }
 
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     CGPoint pos = [[touches anyObject] locationInView:self];
+    NSUInteger index = [Utils getIncreaseIndex];
+    [self addDrawDataWithPos:pos index:index type:PointTypeMove];
     
-    NSMutableArray* ary = [self.drawPosDict objectForKey:move_pos];
-    [ary addObject:NSStringFromCGPoint(pos)];
-    [self.drawPosDict setObject:ary forKey:move_pos];
-    
-    if(self.delegate && [self.delegate respondsToSelector:@selector(drawMove:)])
+    if(self.delegate && [self.delegate respondsToSelector:@selector(drawWithPos:index:type:)])
     {
         CGSize size = self.frame.size;
         CGPoint newPos = CGPointMake(pos.x/size.width, pos.y/size.height);
-        [self.delegate drawMove:newPos];
+        [self.delegate drawWithPos:newPos index:index type:PointTypeMove];
     }
 }
 
 -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
     CGPoint pos = [[touches anyObject] locationInView:self];
+    NSUInteger index = [Utils getIncreaseIndex];
+    [self addDrawDataWithPos:pos index:index type:PointTypeEnd];
     
-    [self.drawPosDict setObject:NSStringFromCGPoint(pos) forKey:end_pos];
-    
-    if(self.delegate && [self.delegate respondsToSelector:@selector(endDraw:)])
+    if(self.delegate && [self.delegate respondsToSelector:@selector(drawWithPos:index:type:)])
     {
         CGSize size = self.frame.size;
         CGPoint newPos = CGPointMake(pos.x/size.width, pos.y/size.height);
-        [self.delegate endDraw:newPos];
+        [self.delegate drawWithPos:newPos index:index type:PointTypeEnd];
     }
 }
 
@@ -167,21 +162,17 @@ const NSString* end_pos = @"endPos";
     return self.isUseEraser;
 }
 
--(void)setStartPos:(CGPoint)pos
+-(void)addDrawDataWithPos:(CGPoint)pos index:(NSUInteger)index type:(PointType)type
 {
-    [self.drawPosDict setObject:NSStringFromCGPoint(pos) forKey:start_pos];
-}
-
--(void)addMoveToPos:(CGPoint)pos
-{
-    NSMutableArray* ary = [self.drawPosDict objectForKey:move_pos];
-    [ary addObject:NSStringFromCGPoint(pos)];
-    [self.drawPosDict setObject:ary forKey:move_pos];
-}
-
--(void)setEndPos:(CGPoint)pos
-{
-    [self.drawPosDict setObject:NSStringFromCGPoint(pos) forKey:end_pos];
+    DrawData* data = [[DrawData alloc] init];
+    data.pos = pos;
+    data.index = index;
+    data.pointType = type;
+    [self.drawDataAry addObject:data];
+    
+    [self.drawDataAry sortUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        return ((DrawData*)obj1).index > ((DrawData*)obj2).index;
+    }];
 }
 
 #pragma mark - self method
@@ -230,29 +221,32 @@ const NSString* end_pos = @"endPos";
 
 -(void)displaylink:(CADisplayLink *)sender
 {
-    NSString* startPos = [self.drawPosDict objectForKey:start_pos];
-    if(![startPos isEqualToString:@""])
+    if(self.drawDataAry.count < 1)
     {
-        [self beganDrawWithPos:CGPointFromString(startPos)];
-        [self.drawPosDict setObject:@"" forKey:start_pos];
+        return;
     }
     
-    NSMutableArray* ary = [self.drawPosDict objectForKey:move_pos];
-    if(ary.count > 0)
+    DrawData* data = [self.drawDataAry objectAtIndex:0];
+//    if(data.index > 0 && data.index != self.lastDrawIndex+1)
+//    {
+//        return;
+//    }
+    if(data.pointType == PointTypeBegan)
     {
-        CGPoint pos = CGPointFromString([ary objectAtIndex:0]);
-        [self drawWithPos:pos];
-        [ary removeObjectAtIndex:0];
-        [self.drawPosDict setObject:ary forKey:move_pos];
+        [self beganDrawWithPos:data.pos];
     }
-    
-    NSString* endPos = [self.drawPosDict objectForKey:end_pos];
-    if(ary.count <= 0 && ![endPos isEqualToString:@""])
+    else if(data.pointType == PointTypeMove)
     {
-        [self drawWithPos:CGPointFromString(endPos)];
+        [self drawWithPos:data.pos];
+    }
+    else if(data.pointType == PointTypeEnd)
+    {
+        [self drawWithPos:data.pos];
         [self endDraw];
-        [self.drawPosDict setObject:@"" forKey:end_pos];
     }
+    
+//    self.lastDrawIndex = data.index;
+    [self.drawDataAry removeObjectAtIndex:0];
 }
 
 -(void)clearPath

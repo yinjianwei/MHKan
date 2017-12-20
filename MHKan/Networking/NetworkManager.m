@@ -149,13 +149,19 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
 
 -(void)closeStream
 {
-    [self.inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self.inputStream close];
-    self.inputStream = nil;
+    if(self.inputStream)
+    {
+        [self.inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        [self.inputStream close];
+        self.inputStream = nil;
+    }
     
-    [self.outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self.outputStream close];
-    self.outputStream = nil;
+    if(self.outputStream)
+    {
+        [self.outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        [self.outputStream close];
+        self.outputStream = nil;
+    }
 }
 
 -(BOOL)writeData:(NSDictionary*)datas
@@ -167,7 +173,6 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
     }
     
     NSError* error;
-    NSLog(@"send data:%@", datas);
     NSData* data = [NSJSONSerialization dataWithJSONObject:datas options:NSJSONWritingPrettyPrinted error:&error];
     if(error)
     {
@@ -180,7 +185,7 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
     NSInteger byteWrite = [self.outputStream write:(const uint8_t *)sendData.bytes maxLength:sendData.length];
     if(byteWrite != sendData.length)
     {
-        NSLog(@"byte write error: write=%ld, all=%ld", byteWrite, data.length);
+        NSLog(@"byte write error: write=%ld, all=%ld", (long)byteWrite, (unsigned long)data.length);
         return NO;
     }
     
@@ -288,21 +293,21 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
             }
         }break;
         case NSStreamEventHasSpaceAvailable:{
-            
+//            NSLog(@"event:NSStreamEventHasSpaceAvailable!!!");
         }break;
         case NSStreamEventHasBytesAvailable:{
             if(aStream == self.inputStream)
             {
-                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-                    [self readData];
-                    dispatch_semaphore_signal(semaphore);
-                });
+                [self readData];
+//                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+//                    dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+//                    dispatch_semaphore_signal(semaphore);
+//                });
             }
             
         }break;
         case NSStreamEventErrorOccurred:{
-            
+            NSLog(@"error:NSStreamEventErrorOccurred!!!");
         }break;
         case NSStreamEventEndEncountered:{
             [self closeStream];
@@ -353,7 +358,7 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
     id tmpProcesser = [self.protocolProcessers objectForKey:@(protocolType)];
     if(tmpProcesser)
     {
-        NSLog(@"already have processer for %ld", protocolType);
+        NSLog(@"already have processer for %ld", (long)protocolType);
         return;
     }
     
@@ -367,13 +372,10 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
     NetData* data = [self.dataQueue getSendData];
     if(data)
     {
-//        dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
-//        dispatch_async(queue, ^{
-            if([self writeData:data.sendDatas])
-            {
-                data.isSend = YES;
-            }
-//        });
+        if([self writeData:data.sendDatas])
+        {
+            data.isSend = YES;
+        }
     }
 }
 
@@ -417,8 +419,15 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
             {
                 uint8_t readByte[dataLength];
                 byteRead = [self.inputStream read:readByte maxLength:byteRead];
-                self.tmpData = [NSMutableData dataWithLength:dataLength];
-                [self.tmpData appendBytes:readByte length:byteRead];
+                if(byteRead > 0)
+                {
+                    self.tmpData = [NSMutableData dataWithLength:dataLength];
+                    [self.tmpData appendBytes:readByte length:byteRead];
+                }
+                else if(byteRead == -1)
+                {
+                    NSLog(@"error:%@", self.inputStream.streamError);
+                }
                 break;
             }
             else
@@ -436,19 +445,17 @@ static NSString * kWiTapBonjourType = @"_mhkan._tcp.";
 
 -(void)processReciveData:(NSData*)data
 {
-    NSError* error;
-    NSDictionary* recvData = (NSDictionary*)[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
-    NSNumber* protocolType = [recvData objectForKey:PROTOCOL_TYPE];
-    NSNumber* processType = [recvData objectForKey:PROCESS_TYPE];
-    if(!processType || !processType)
-    {
-        NSLog(@"recvData:%@", recvData);
-    }
-    BaseProtocols* processer = [self.protocolProcessers objectForKey:protocolType];
-    if(processer)
-    {
-        [processer processServerData:recvData];
-    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSError* error;
+        NSDictionary* recvData = (NSDictionary*)[NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:&error];
+        NSNumber* protocolType = [recvData objectForKey:PROTOCOL_TYPE];
+        NSNumber* processType = [recvData objectForKey:PROCESS_TYPE];
+        BaseProtocols* processer = [self.protocolProcessers objectForKey:protocolType];
+        if(processer)
+        {
+            [processer processServerData:recvData];
+        }
+    });
 }
 
 @end
